@@ -1,7 +1,7 @@
-module Myelem 
+module Myelem  
 ( elemTotal 
 , elem2 
-, elemAt  
+, elemAt 
 , elemAtTotal 
 ) where 
 
@@ -11,7 +11,7 @@ elemTotal :: (Eq a) => [a] -> [[a]] -> [Bool]
 elemTotal pair assigns = map (elem2 pair) assigns
 
 elem2 :: (Eq a) => [a] -> [a] -> Bool
-elem2 pair assign = (elem x0 assign) && (elem x1 assign) && ((ind x1 assign) - (ind x0 assign)==1)
+elem2 pair assign = (elem x0 assign) && (elem x1 assign) && (((ind x1 assign) - (ind x0 assign)==1)||((ind x1 assign)-(ind x0 assign)==(-7)))
   where x0 = pair!!0
         x1 = pair!!1
         ind x y = case elemIndex x y of
