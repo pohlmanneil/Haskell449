@@ -1,5 +1,5 @@
 module Gridparser
-( parseGridToTrip 
+(parseGridToTrip 
 ) where
 
 import Data.List

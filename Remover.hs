@@ -1,6 +1,7 @@
 module Remover  
 ( removeIllegalNeighbour  
 , removeIllegalMachTask 
+, removeNonForcedAssign  
 , addNeighWeight 
 , addAssignWeight  
 , removeExpensive
@@ -15,6 +16,10 @@ removeIllegalNeighbour pair assigns = [ fst x | x <- result, not (snd x)]
   
 removeIllegalMachTask :: (Eq a, Integral a) => [a] -> [[a]] -> [[a]]
 removeIllegalMachTask pair assigns = [ fst x | x <- result, not (snd x)]
+  where result = zip assigns (elemAtTotal pair assigns)
+  
+removeNonForcedAssign :: (Eq a, Integral a) => [a] -> [[a]] -> [[a]]
+removeNonForcedAssign pair assigns = [ fst x | x <- result, snd x]
   where result = zip assigns (elemAtTotal pair assigns)
 
 addNeighWeight :: (Eq a, Integral a) => [a] -> [[a]] -> [[a]]
