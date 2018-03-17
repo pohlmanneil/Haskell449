@@ -1,7 +1,7 @@
-module Myelem  
+module Myelem 
 ( elemTotal 
 , elem2 
-, elemAt 
+, elemAt  
 , elemAtTotal 
 ) where 
 
