@@ -24,13 +24,13 @@ fileParser = do
 parseS :: String -> Either ParseError [Text]
 parseS input = parse fileParser "" input
 
-compareMe c f 0 = return()
-compareMe c f s = do
+getIndex c f -1 = return(-1)
+getIndex c f s = do
     let p = c !! s
     let y = stripPrefix (p) (f)
     putStrLn (p)
-    if y == (Just "") then putStrLn ("match found")
-    else compareMe (c) (f) (s-1)
+    if y == (Just "") then return s
+    else getIndex (c) (f) (s-1)
 
 main = do
     args <- getArgs
