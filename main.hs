@@ -44,9 +44,9 @@ myStrToInt rawStr = [read rawStr :: Integer]
 
 main = do
   args <- getArgs
-  inputFile <- (head args)
-  outputFile <- (last args)
-  handle <- openFile inputFile ReadMode
+  --inputFile <- (head args)
+  --outputFile <- (last args)
+  handle <- openFile (head args) ReadMode
   contents <- hGetContents handle
   let rawIn = lines contents
   
