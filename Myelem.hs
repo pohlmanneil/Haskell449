@@ -1,7 +1,7 @@
-module Myelem 
+module Myelem  
 ( elemTotal 
 , elem2 
-, elemAt  
+, elemAt 
 , elemAtTotal 
 ) where 
 
@@ -15,7 +15,7 @@ elem2 pair assign = (elem x0 assign) && (elem x1 assign) && (((ind x1 assign) - 
   where x0 = pair!!0
         x1 = pair!!1
         ind x y = case elemIndex x y of
-          Just n -> n
+          Just n -> n 
           
 
 elemAtTotal :: (Eq a, Integral a) => [a] -> [[a]] -> [Bool]

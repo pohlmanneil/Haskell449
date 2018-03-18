@@ -1,10 +1,11 @@
-module Remover  
+module PairTripCheck  
 ( removeIllegalNeighbour  
-, removeIllegalMachTask 
+, removeIllegalMachTask  
 , removeNonForcedAssign  
 , addNeighWeight 
 , addAssignWeight  
-, removeExpensive
+, removeExpensive  
+, removeMulMachTask
 ) where
 
 import Myelem
@@ -17,7 +18,7 @@ removeIllegalNeighbour pair assigns = [ fst x | x <- result, not (snd x)]
 removeIllegalMachTask :: (Eq a, Integral a) => [a] -> [[a]] -> [[a]]
 removeIllegalMachTask pair assigns = [ fst x | x <- result, not (snd x)]
   where result = zip assigns (elemAtTotal pair assigns)
-  
+
 removeNonForcedAssign :: (Eq a, Integral a) => [a] -> [[a]] -> [[a]]
 removeNonForcedAssign pair assigns = [ fst x | x <- result, snd x]
   where result = zip assigns (elemAtTotal pair assigns)
@@ -29,6 +30,17 @@ addNeighWeight trip assigns = [if (snd x) then ((init (fst x)) ++ [(last (fst x)
 addAssignWeight :: (Eq a, Integral a) => [a] -> [[a]] -> [[a]]
 addAssignWeight trip assigns = [if (snd x) then ((init (fst x)) ++ [(last (fst x))+(trip!!2)]) else (fst x) | x <- result]
   where result = zip assigns (elemAtTotal trip assigns)
-
+  
 removeExpensive :: (Eq a, Integral a) => [[a]] -> [a]
 removeExpensive assigns = head (sortByPenalty assigns)
+
+--remove ALL the illegal neighbours--
+removeMulIllNeigh [] assigns = assigns
+removeMulIllNeigh _ [] = []
+removeMulIllNeigh pairs assigns = removeMulIllNeigh (tail pairs) (removeIllegalNeighbour (head pairs) assigns)
+
+--remove ALL the illegal mach task
+removeMulMachTask [] assigns = assigns
+removeMulMachTask _ [] = []
+removeMulMachTask pairs assigns = removeMulMachTask (tail pairs) (removeIllegalMachTask (head pairs) assigns)
+
