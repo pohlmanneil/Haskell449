@@ -43,10 +43,10 @@ myStrToInt "" = []
 myStrToInt rawStr = [read rawStr :: Integer]
 
 main = do
-  --args <- getArgs
-  --inputFile <- (head args)
-  --outputFile <- (last args)
-  handle <- openFile "test.txt" ReadMode
+  args <- getArgs
+  inputFile <- (head args)
+  outputFile <- (last args)
+  handle <- openFile inputFile ReadMode
   contents <- hGetContents handle
   let rawIn = lines contents
   
