@@ -1,4 +1,4 @@
-module PairTripCheck  
+module Remover  
 ( removeIllegalNeighbour  
 , removeIllegalMachTask  
 , removeNonForcedAssign  
@@ -6,6 +6,10 @@ module PairTripCheck
 , addAssignWeight  
 , removeExpensive  
 , removeMulMachTask
+, removeMulIllNeigh  
+, removeMulNonForced  
+, addMulNeigh
+, addMulAss
 ) where
 
 import Myelem
@@ -43,4 +47,21 @@ removeMulIllNeigh pairs assigns = removeMulIllNeigh (tail pairs) (removeIllegalN
 removeMulMachTask [] assigns = assigns
 removeMulMachTask _ [] = []
 removeMulMachTask pairs assigns = removeMulMachTask (tail pairs) (removeIllegalMachTask (head pairs) assigns)
+
+--remove ALL the non forced assignments--
+removeMulNonForced [] assigns = assigns
+removeMulNonForced _ [] = []
+removeMulNonForced pairs assigns = removeMulNonForced (tail pairs) (removeNonForcedAssign (head pairs) assigns)
+
+--add ALL the neighbour penalties--
+addMulNeigh :: [[Integer]] -> [[Integer]] -> [[Integer]]
+addMulNeigh [] assigns = assigns
+addMulNeigh trips assigns = addMulNeigh (tail trips) (addNeighWeight (head trips) assigns)
+
+--add ALL the assignment penalties--
+addMulAss :: [[Integer]] -> [[Integer]] -> [[Integer]]
+addMulAss [] assigns = assigns
+addMulAss trips assigns = addMulAss (tail trips) (addAssignWeight (head trips) assigns)
+
+
 

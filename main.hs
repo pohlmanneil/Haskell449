@@ -3,6 +3,8 @@ import Data.List
 import System.IO
 import Gridparser
 import System.FilePath
+import Remover
+import Sorter
 
 
 trim :: String -> String
@@ -82,34 +84,36 @@ main = do
   let illegPairInt = [parseStringPairs illegString | illegString <- rawIllegPair, (length illegString) > 0]
   
   let grid = concat [ words gridEl | gridEl <- rawGrid]
-  let intGrid = [(read a :: Int) | a <- grid]
+  let intGrid = [(read a :: Integer) | a <- grid]
+  let assTripGrid = parseGridToTrip intGrid
+  
   
   let penalTripInt = [parseStringTrips penalString | penalString <- rawPenalTrip, (length penalString) > 0]
   
   
   
-  print forcedInt
-  print forbidInt
-  print illegPairInt
-  print intGrid
-  print penalTripInt
-  
---  print rawForbid
- -- print rawIllegPair
-  --print rawPenalTrip
+  --creating all assignments with 9th element as penalty
+  let allAssigns = permutations [1..8]
+  let assignsWithWeight = [a ++ [0] | a <- allAssigns]
   
   
+  --remove illegal assignments, then add weights--
+  let assignsNoMachTask = removeMulMachTask forbidInt assignsWithWeight
+  let assignsNoIllNeigh = removeMulIllNeigh illegPairInt assignsNoMachTask
+  let assignsNoForce = removeMulNonForced forcedInt assignsNoIllNeigh
+  let assignsAssPen = addMulAss assTripGrid assignsNoForce
+  let assignsNeighPen = addMulNeigh penalTripInt assignsAssPen
   
   
-  --print intGrid
+  --sort the assignments--
+  let assignSorted = sortByPenalty assignsNeighPen
+
+  
+  print (head assignSorted)
   
   
- 
-  
-  --putStr contents
   hClose handle
   
   --handle <- openFile "test2.txt" WriteMode
   
   
-  --0-7 + 8*n
