@@ -85,7 +85,7 @@ main = do
   
   let grid = concat [ words gridEl | gridEl <- rawGrid]
   let intGrid = [(read a :: Integer) | a <- grid]
-  let assTripGrid = parseGridToTrip intGrid
+  let assTripGrid = if (length intGrid == 64) then parseGridToTrip intGrid else error "bad solution"
   
   
   let penalTripInt = [parseStringTrips penalString | penalString <- rawPenalTrip, (length penalString) > 0]
