@@ -47,11 +47,10 @@ myStrToInt rawStr = [read rawStr :: Integer]
 
 --error1 takes arguments as follows: error1 READFROMHANDLE WRITETOHANDLE WRITETOFILENAME(called by last args) "STRINGTOPRINT"--
 
-error1 :: Handle -> Handle -> FilePath -> [Char] -> IO b0
-error1 inHandle file filename str = do
+error1 :: Handle -> FilePath -> [Char] -> IO b0
+error1 inHandle filename str = do
   writeFile filename str
   hClose inHandle
-  hClose file
   error str
   
 numToLetter :: String -> String
@@ -76,11 +75,12 @@ numToLetter (x:xs)
   | x == '8' = "H" ++" "++ numToLetter xs
 
 main = do
+  args <- getArgs
   --let args = ["test.txt","umm.txt"]
-  outHandle <- openFile (last args) WriteMode --last args
   handle <- openFile (head args) ReadMode --head args
   contents <- hGetContents handle
   let rawIn = lines contents
+
   
   let y = [trim rawLines | rawLines <- rawIn]
   
@@ -105,7 +105,7 @@ main = do
   let tooPenInd = case a of Nothing -> -1
                             Just n -> n
   
-  let troubles = if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle outHandle (last args) "error parsing input") else (readFile (head args))--(readFile (head args)) is placeholder
+  let troubles = if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle (last args) "error parsing input") else (readFile (head args))--(readFile (head args)) is placeholder
   
   --raw (Strings) data--
   let rawForced = take (forbidInd-(forceInd+1)) (drop (forceInd+1) y)
@@ -130,7 +130,7 @@ main = do
   let floatGrid = [(read a :: Float) | a <- grid]
   let intGrid = [floor a | a <- floatGrid, (a == (fromIntegral $ floor a))]
   
-  let troubles = if (length intGrid == 64) then (readFile (head args)) else (error1 handle outHandle (last args) "machine penalty error") --readFile (head args) is placeholder
+  let troubles = if (length intGrid == 64) then (readFile (head args)) else (error1 handle (last args) "machine penalty error") --readFile (head args) is placeholder
   
   
   let assTripGrid = (parseGridToTrip intGrid)
@@ -155,7 +155,7 @@ main = do
   
   --sort the assignments--
   
-  let troubles = if (length assignsNeighPen > 0 ) then (readFile (head args)) else (error1 handle outHandle (last args) "No valid solution possible!")
+  let troubles = if (length assignsNeighPen > 0 ) then (readFile (head args)) else (error1 handle (last args) "No valid solution possible!")
   let assignSorted = sortByPenalty assignsNeighPen
 
   
@@ -165,8 +165,6 @@ main = do
   let stringTasks = numToLetter (take 8 stringAssigns)
   writeFile (last args) ("Solution "++stringTasks++"; Quality: "++(drop 8 stringAssigns)) 
   
-  
   hClose handle
-  hClose outHandle
   
   
