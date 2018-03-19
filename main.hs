@@ -38,6 +38,7 @@ myCharToInt rawStr
   | rawStr == '6' = 6
   | rawStr == '7' = 7
   | rawStr == '8' = 8
+  | otherwise = -1
   
 
 myStrToInt :: [Char] -> [Integer]
@@ -112,7 +113,7 @@ main = do
   let tooPenInd = case a of Nothing -> -1
                             Just n -> n
   
-  if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle (last args) "error parsing input") else (readFile (head args))--(readFile (head args)) is placeholder
+  if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))--(readFile (head args)) is placeholder
   
   --raw (Strings) data--
   let rawForced = take (forbidInd-(forceInd+1)) (drop (forceInd+1) y)
@@ -133,7 +134,7 @@ main = do
   
   let illegPairInt = [parseStringPairs illegString | illegString <- rawIllegPair, (length illegString) > 0]
   
-  --if (elem (True) (map (elem (-1)) (forcedInt++forbidInt++illegPairInt))) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))
+  if (elem (True) (map (elem (-1)) (forcedInt++forbidInt++illegPairInt))) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))
 
   let grid = concat [ words gridEl | gridEl <- rawGrid]
   let floatGrid = [(read a :: Float) | a <- grid]
@@ -147,7 +148,7 @@ main = do
   
   let penalTripInt = [parseStringTrips penalString | penalString <- rawPenalTrip, (length penalString) > 0]
   
-  --if (elem (True) (map (elem (-1)) penalTripInt)) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))
+  if (elem (True) (map (elem (-1)) penalTripInt)) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))
   
   
   --creating all assignments with 9th element as penalty
