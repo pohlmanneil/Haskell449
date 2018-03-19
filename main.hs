@@ -38,6 +38,7 @@ myCharToInt rawStr
   | rawStr == '6' = 6
   | rawStr == '7' = 7
   | rawStr == '8' = 8
+  
 
 myStrToInt :: [Char] -> [Integer]
 myStrToInt "" = []
@@ -49,9 +50,15 @@ myStrToInt rawStr = [read rawStr :: Integer]
 
 error1 :: Handle -> FilePath -> [Char] -> IO b0
 error1 inHandle filename str = do
-  writeFile filename str
+  
+  outHandle <- openFile filename WriteMode
+  hPutStrLn outHandle (str)
+  hClose outHandle
+
+  
+  --writeFile filename str
   hClose inHandle
-  error str
+  error ""
   
 numToLetter :: String -> String
 numToLetter "" = ""
@@ -105,7 +112,7 @@ main = do
   let tooPenInd = case a of Nothing -> -1
                             Just n -> n
   
-  let troubles = if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle (last args) "error parsing input") else (readFile (head args))--(readFile (head args)) is placeholder
+  if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle (last args) "error parsing input") else (readFile (head args))--(readFile (head args)) is placeholder
   
   --raw (Strings) data--
   let rawForced = take (forbidInd-(forceInd+1)) (drop (forceInd+1) y)
@@ -126,11 +133,13 @@ main = do
   
   let illegPairInt = [parseStringPairs illegString | illegString <- rawIllegPair, (length illegString) > 0]
   
+  --if (elem (True) (map (elem (-1)) (forcedInt++forbidInt++illegPairInt))) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))
+
   let grid = concat [ words gridEl | gridEl <- rawGrid]
   let floatGrid = [(read a :: Float) | a <- grid]
   let intGrid = [floor a | a <- floatGrid, (a == (fromIntegral $ floor a))]
   
-  let troubles = if (length intGrid == 64) then (readFile (head args)) else (error1 handle (last args) "machine penalty error") --readFile (head args) is placeholder
+  if (length intGrid == 64) then (readFile (head args)) else (error1 handle (last args) "machine penalty error") --readFile (head args) is placeholder
   
   
   let assTripGrid = (parseGridToTrip intGrid)
@@ -138,6 +147,7 @@ main = do
   
   let penalTripInt = [parseStringTrips penalString | penalString <- rawPenalTrip, (length penalString) > 0]
   
+  --if (elem (True) (map (elem (-1)) penalTripInt)) then (error1 handle (last args) "Error while parsing input file") else (readFile (head args))
   
   
   --creating all assignments with 9th element as penalty
@@ -147,15 +157,29 @@ main = do
   
   --remove illegal assignments, then add weights--
   let assignsNoMachTask = removeMulMachTask forbidInt assignsWithWeight
-  let assignsNoIllNeigh = removeMulIllNeigh illegPairInt assignsNoMachTask
-  let assignsNoForce = removeMulNonForced forcedInt assignsNoIllNeigh
-  let assignsAssPen = addMulAss assTripGrid assignsNoForce
-  let assignsNeighPen = addMulNeigh penalTripInt assignsAssPen
+  if ((length assignsNoMachTask) == 0 ) then (error1 handle (last args) "No valid solution possible!") else (readFile (head args))
   
+
+  let assignsNoIllNeigh = removeMulIllNeigh illegPairInt assignsNoMachTask
+  if ((length assignsNoIllNeigh) == 0 ) then (error1 handle (last args) "No valid solution possible!") else (readFile (head args))
+
+
+  let assignsNoForce = removeMulNonForced forcedInt assignsNoIllNeigh
+  if ((length assignsNoForce) == 0) then (error1 handle (last args) "No valid solution possible!") else (readFile (head args))
+
+
+  let assignsAssPen = addMulAss assTripGrid assignsNoForce
+  if ((length assignsAssPen) == 0 ) then (error1 handle (last args) "No valid solution possible!") else (readFile (head args))
+
+
+  let assignsNeighPen = addMulNeigh penalTripInt assignsAssPen
+  if ((length assignsNeighPen) == 0 ) then (error1 handle (last args) "No valid solution possible!") else (readFile (head args))
+
+
   
   --sort the assignments--
   
-  let troubles = if (length assignsNeighPen > 0 ) then (readFile (head args)) else (error1 handle (last args) "No valid solution possible!")
+  --let troubles = if (length assignsNeighPen > 0 ) then (readFile (head args)) else (error1 handle (last args) "No valid solution possible!")
   let assignSorted = sortByPenalty assignsNeighPen
 
   
@@ -163,7 +187,11 @@ main = do
   --Write the best assignment to the file--
   let stringAssigns = concat [show a | a <- (head assignSorted)]
   let stringTasks = numToLetter (take 8 stringAssigns)
-  writeFile (last args) ("Solution "++stringTasks++"; Quality: "++(drop 8 stringAssigns)) 
+  
+  outHandle <- openFile (last args) WriteMode
+  hPutStrLn outHandle ("Solution "++stringTasks++"; Quality: "++(drop 8 stringAssigns))
+  hClose outHandle
+  --writeFile (last args) ("Solution "++stringTasks++"; Quality: "++(drop 8 stringAssigns)) 
   
   hClose handle
   
