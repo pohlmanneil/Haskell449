@@ -5,6 +5,7 @@ import Gridparser
 import System.FilePath
 import Remover
 import Sorter
+import System.Environment
 
 
 trim :: String -> String
@@ -42,10 +43,15 @@ myStrToInt :: [Char] -> [Integer]
 myStrToInt "" = []
 myStrToInt rawStr = [read rawStr :: Integer]
 
+--just brainstorming for what error1 does. file is outputFile and writeTofile may not be correct function
+--error1 file str = do
+  --writeTofile file str
+  --error str
+
 main = do
   args <- getArgs
-  --inputFile <- (head args)
-  --outputFile <- (last args)
+  --let inputFile = (head args)
+  --let outputFile = (last args)
   handle <- openFile (head args) ReadMode
   contents <- hGetContents handle
   let rawIn = lines contents
@@ -53,15 +59,25 @@ main = do
   let y = [trim rawLines | rawLines <- rawIn]
   
   --Index of each header--
-  let Just forceInd = elemIndex "forced partial assignment:" y
+  let a = elemIndex "forced partial assignment:" y
+  let forceInd = case a of Nothing -> error1 "error parsing input"
+                           Just n -> n
   
-  let Just forbidInd = elemIndex "forbidden machine:" y
+  let a = elemIndex "forbidden machine:" y
+  let forbidInd = case a of Nothing -> error1 "error parsing input"
+                            Just n -> n
   
-  let Just tooTaskInd = elemIndex "too-near tasks:" y
+  let a = elemIndex "too-near tasks:" y
+  let tooTaskInd = case a of Nothing -> error1 "error parsing input"
+                             Just n -> n
   
-  let Just machineInd = elemIndex "machine penalties:" y
-
-  let Just tooPenInd = elemIndex "too-near penalities" y
+  let a = elemIndex "machine penalties:" y
+  let machineInd = case a of Nothing -> error1 "error parsing input"
+                             Just n -> n
+  
+  let a = elemIndex "too-near penalities" y
+  let tooPenInd = case a of Nothing -> error1 "error parsing input"
+                            Just n -> n
   
   
   --raw (Strings) data--
@@ -84,8 +100,10 @@ main = do
   let illegPairInt = [parseStringPairs illegString | illegString <- rawIllegPair, (length illegString) > 0]
   
   let grid = concat [ words gridEl | gridEl <- rawGrid]
-  let intGrid = [(read a :: Integer) | a <- grid]
-  let assTripGrid = if (length intGrid == 64) then parseGridToTrip intGrid else error "bad solution"
+  let floatGrid = [(read a :: Float) | a <- grid]
+  let intGrid = [floor a | a <- floatGrid, (a == (fromIntegral $ floor a))]
+  
+  let assTripGrid = if (length intGrid == 64) then (parseGridToTrip intGrid) else error1 "bad solution"
   
   
   let penalTripInt = [parseStringTrips penalString | penalString <- rawPenalTrip, (length penalString) > 0]
