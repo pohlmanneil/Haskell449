@@ -124,7 +124,7 @@ main = do
   
   
   --sort the assignments--
-  let assignSorted = sortByPenalty assignsNeighPen
+  let assignSorted = if (length assignsNeighPen > 0) then sortByPenalty assignsNeighPen else error "bad solution"
 
   
   print (head assignSorted)
