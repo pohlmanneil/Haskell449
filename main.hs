@@ -44,15 +44,41 @@ myStrToInt "" = []
 myStrToInt rawStr = [read rawStr :: Integer]
 
 --just brainstorming for what error1 does. file is outputFile and writeTofile may not be correct function
---error1 file str = do
-  --writeTofile file str
-  --error str
+
+--error1 takes arguments as follows: error1 READFROMHANDLE WRITETOHANDLE WRITETOFILENAME(called by last args) "STRINGTOPRINT"--
+
+error1 :: Handle -> Handle -> FilePath -> [Char] -> IO b0
+error1 inHandle file filename str = do
+  writeFile filename str
+  hClose inHandle
+  hClose file
+  error str
+  
+numToLetter :: String -> String
+numToLetter "" = ""
+numToLetter (x:[])
+  | x == '1' = "A"
+  | x == '2' = "B"
+  | x == '3' = "C"
+  | x == '4' = "D"
+  | x == '5' = "E"
+  | x == '6' = "F"
+  | x == '7' = "G"
+  | x == '8' = "H"
+numToLetter (x:xs)
+  | x == '1' = "A" ++" "++ numToLetter xs
+  | x == '2' = "B" ++" "++ numToLetter xs
+  | x == '3' = "C" ++" "++ numToLetter xs
+  | x == '4' = "D" ++" "++ numToLetter xs
+  | x == '5' = "E" ++" "++ numToLetter xs
+  | x == '6' = "F" ++" "++ numToLetter xs
+  | x == '7' = "G" ++" "++ numToLetter xs
+  | x == '8' = "H" ++" "++ numToLetter xs
 
 main = do
-  args <- getArgs
-  --let inputFile = (head args)
-  --let outputFile = (last args)
-  handle <- openFile (head args) ReadMode
+  --let args = ["test.txt","umm.txt"]
+  outHandle <- openFile (last args) WriteMode --last args
+  handle <- openFile (head args) ReadMode --head args
   contents <- hGetContents handle
   let rawIn = lines contents
   
@@ -60,25 +86,26 @@ main = do
   
   --Index of each header--
   let a = elemIndex "forced partial assignment:" y
-  let forceInd = case a of Nothing -> error1 "error parsing input"
+  let forceInd = case a of Nothing -> -1
                            Just n -> n
   
   let a = elemIndex "forbidden machine:" y
-  let forbidInd = case a of Nothing -> error1 "error parsing input"
+  let forbidInd = case a of Nothing -> -1
                             Just n -> n
   
   let a = elemIndex "too-near tasks:" y
-  let tooTaskInd = case a of Nothing -> error1 "error parsing input"
+  let tooTaskInd = case a of Nothing -> -1
                              Just n -> n
   
   let a = elemIndex "machine penalties:" y
-  let machineInd = case a of Nothing -> error1 "error parsing input"
+  let machineInd = case a of Nothing -> -1
                              Just n -> n
   
   let a = elemIndex "too-near penalities" y
-  let tooPenInd = case a of Nothing -> error1 "error parsing input"
+  let tooPenInd = case a of Nothing -> -1
                             Just n -> n
   
+  let troubles = if ((forceInd == -1)||(forbidInd == -1)||(tooTaskInd == -1)||(machineInd == -1)||(tooPenInd == -1)) then (error1 handle outHandle (last args) "error parsing input") else (readFile (head args))--(readFile (head args)) is placeholder
   
   --raw (Strings) data--
   let rawForced = take (forbidInd-(forceInd+1)) (drop (forceInd+1) y)
@@ -103,7 +130,10 @@ main = do
   let floatGrid = [(read a :: Float) | a <- grid]
   let intGrid = [floor a | a <- floatGrid, (a == (fromIntegral $ floor a))]
   
-  let assTripGrid = if (length intGrid == 64) then (parseGridToTrip intGrid) else error1 "bad solution"
+  let troubles = if (length intGrid == 64) then (readFile (head args)) else (error1 handle outHandle (last args) "machine penalty error") --readFile (head args) is placeholder
+  
+  
+  let assTripGrid = (parseGridToTrip intGrid)
   
   
   let penalTripInt = [parseStringTrips penalString | penalString <- rawPenalTrip, (length penalString) > 0]
@@ -124,14 +154,19 @@ main = do
   
   
   --sort the assignments--
-  let assignSorted = if (length assignsNeighPen > 0) then sortByPenalty assignsNeighPen else error "bad solution"
+  
+  let troubles = if (length assignsNeighPen > 0 ) then (readFile (head args)) else (error1 handle outHandle (last args) "No valid solution possible!")
+  let assignSorted = sortByPenalty assignsNeighPen
 
   
-  print (head assignSorted)
+  --print (head assignSorted)
+  --Write the best assignment to the file--
+  let stringAssigns = concat [show a | a <- (head assignSorted)]
+  let stringTasks = numToLetter (take 8 stringAssigns)
+  writeFile (last args) ("Solution "++stringTasks++"; Quality: "++(drop 8 stringAssigns)) 
   
   
   hClose handle
-  
-  --handle <- openFile "test2.txt" WriteMode
+  hClose outHandle
   
   
